@@ -1,4 +1,4 @@
-package com.patrickshim.univtodolist;
+package com.patrickshim.univtodolist.tasks;
 
 import java.util.Date;
 

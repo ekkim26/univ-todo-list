@@ -1,4 +1,4 @@
-package com.patrickshim.univtodolist;
+package com.patrickshim.univtodolist.tasks;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -8,22 +8,25 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 
-import com.patrickshim.univtodolist.tasks.Task;
-import com.patrickshim.univtodolist.tasks.TaskAdapter;
+import com.patrickshim.univtodolist.R;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class TasksActivity extends AppCompatActivity implements TasksActivityView {
 
     ListView listview;
     Button addTodo;
     EditText todoEditText;
+    private TasksActivityPresenter presenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_tasks);
+
+        presenter = new TasksActivityPresenter(this, null);
 
         listview = (ListView)findViewById(R.id.todoListView);
         todoEditText = (EditText)findViewById(R.id.todoEditText);
@@ -60,6 +63,16 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+
+    }
+
+    @Override
+    public void displayTasks(List<Task> taskList) {
+
+    }
+
+    @Override
+    public void displayNoTasks() {
 
     }
 }

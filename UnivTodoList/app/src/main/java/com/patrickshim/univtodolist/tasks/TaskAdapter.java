@@ -1,4 +1,4 @@
-package com.patrickshim.univtodolist;
+package com.patrickshim.univtodolist.tasks;
 
 import android.content.Context;
 import android.support.annotation.LayoutRes;
@@ -9,6 +9,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
+
+import com.patrickshim.univtodolist.R;
 
 import java.util.List;
 
