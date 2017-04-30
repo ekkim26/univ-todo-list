@@ -24,4 +24,25 @@ class TasksActivityPresenter {
         if (taskList.isEmpty()) view.displayNoTasks();
         else view.displayTasks(taskList);
     }
+
+    public void saveTask(Task task) {
+        Task savedTask = tasksRepository.addTask(task);
+
+        if (savedTask != null) {
+            view.addTask(task);
+        } else {
+            view.addNoTask();
+        }
+    }
+
+    public void deleteTask(Task task) {
+        Task removedTask = tasksRepository.removeTask(task);
+
+        if (removedTask != null) {
+            view.removeTask(task);
+        } else {
+            view.removeNoTask();
+        }
+
+    }
 }

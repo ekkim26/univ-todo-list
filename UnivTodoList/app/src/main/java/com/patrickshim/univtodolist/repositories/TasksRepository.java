@@ -12,4 +12,7 @@ public interface TasksRepository {
 
     List<Task> getTasks();
 
+    Task addTask(Task task);
+
+    Task removeTask(Task task);
 }

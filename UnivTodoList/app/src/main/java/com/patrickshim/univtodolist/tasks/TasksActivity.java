@@ -2,23 +2,28 @@ package com.patrickshim.univtodolist.tasks;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.patrickshim.univtodolist.R;
+import com.patrickshim.univtodolist.repositories.impl.DatabaseTasksRepository;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 public class TasksActivity extends AppCompatActivity implements TasksActivityView {
 
+    private static final String TAG = TasksActivity.class.getSimpleName();
+
     ListView listview;
     Button addTodo;
     EditText todoEditText;
+    TaskAdapter taskAdapter;
     private TasksActivityPresenter presenter;
 
     @Override
@@ -26,26 +31,17 @@ public class TasksActivity extends AppCompatActivity implements TasksActivityVie
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tasks);
 
-        presenter = new TasksActivityPresenter(this, null);
-
         listview = (ListView)findViewById(R.id.todoListView);
         todoEditText = (EditText)findViewById(R.id.todoEditText);
 
-        final ArrayList<Task> taskList = new ArrayList<>();
-        taskList.add(new Task("할 일 1", new Date()));
-        taskList.add(new Task("할 일 2", new Date()));
-        taskList.add(new Task("할 일 3", new Date()));
+        presenter = new TasksActivityPresenter(this, new DatabaseTasksRepository(getApplication()));
 
-        final TaskAdapter taskAdapter = new TaskAdapter(this, android.R.layout.simple_list_item_1, taskList);
-        listview.setAdapter(taskAdapter);
+        presenter.loadTasks();
 
         listview.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-
-                taskList.remove(position);
-                taskAdapter.notifyDataSetChanged();
-
+                presenter.deleteTask((Task)parent.getItemAtPosition(position));
                 return false;
             }
         });
@@ -53,13 +49,16 @@ public class TasksActivity extends AppCompatActivity implements TasksActivityVie
 
         addTodo = (Button)findViewById(R.id.addTodo);
         addTodo.setOnClickListener(new View.OnClickListener() {
+
+            private final int MIN_TASK_LENGTH = 1;
+
             @Override
             public void onClick(View v) {
                 String task = todoEditText.getText().toString();
-                if (task.length() > 0) {
-                    taskList.add(new Task(task, new Date()));
-                    taskAdapter.notifyDataSetChanged();
-                    todoEditText.setText("");
+                if (task.length() >= MIN_TASK_LENGTH) {
+                    presenter.saveTask(new Task(task, new Date()));
+                } else {
+                    Toast.makeText(getApplicationContext(), "할 일을 입력하세요!", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -68,11 +67,36 @@ public class TasksActivity extends AppCompatActivity implements TasksActivityVie
 
     @Override
     public void displayTasks(List<Task> taskList) {
-
+        Log.d(TAG, "displayTasks: found some tasks");
+        taskAdapter = new TaskAdapter(this, android.R.layout.simple_list_item_1, taskList);
+        listview.setAdapter(taskAdapter);
     }
 
     @Override
     public void displayNoTasks() {
+        Log.d(TAG, "displayNoTasks: found no tasks");
+    }
 
+    @Override
+    public void addTask(Task task) {
+        taskAdapter.add(task);
+        taskAdapter.notifyDataSetChanged();
+        todoEditText.setText("");
+    }
+
+    @Override
+    public void addNoTask() {
+        Toast.makeText(this, "할 일 추가 도중 에러가 발생했습니다. 다시 시도해주세요.", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void removeTask(Task task) {
+        taskAdapter.remove(task);
+        taskAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void removeNoTask() {
+        Toast.makeText(this, "할 일 삭제 도중 에러가 발생했습니다. 다시 시도해주세요.", Toast.LENGTH_SHORT).show();
     }
 }

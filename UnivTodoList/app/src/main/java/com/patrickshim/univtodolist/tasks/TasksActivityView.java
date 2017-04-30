@@ -12,4 +12,12 @@ public interface TasksActivityView {
 
     void displayNoTasks();
 
+    void addTask(Task task);
+
+    void addNoTask();
+
+    void removeTask(Task task);
+
+    void removeNoTask();
+
 }

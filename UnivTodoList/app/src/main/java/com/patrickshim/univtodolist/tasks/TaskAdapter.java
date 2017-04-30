@@ -45,7 +45,7 @@ public class TaskAdapter extends ArrayAdapter<Task> {
 
             TextView taskDate = (TextView)v.findViewById(R.id.taskDate);
             if (taskDate != null) {
-                taskDate.setText(task.getDate().toString());
+                taskDate.setText(task.getCreatedAt().toString());
             }
 
         }

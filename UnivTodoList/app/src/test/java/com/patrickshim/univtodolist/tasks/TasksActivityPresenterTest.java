@@ -19,7 +19,7 @@ public class TasksActivityPresenterTest {
 
         // given : initialize condition
         TasksActivityView view = new MockView();
-        TasksRepository tasksRepository = new MockTasksRepository(true);
+        TasksRepository tasksRepository = new MockTasksRepository(true, true, true);
 
         // when : the action that you want to test
         TasksActivityPresenter presenter = new TasksActivityPresenter(view, tasksRepository);
@@ -34,7 +34,7 @@ public class TasksActivityPresenterTest {
     public void shouldHandleNoTasks() {
         // given
         TasksActivityView view = new MockView();
-        TasksRepository tasksRepository = new MockTasksRepository(false);
+        TasksRepository tasksRepository = new MockTasksRepository(false, true, true);
 
         // when
         TasksActivityPresenter presenter = new TasksActivityPresenter(view, tasksRepository);
@@ -44,11 +44,66 @@ public class TasksActivityPresenterTest {
         Assert.assertEquals(true, ((MockView) view).displayTasksWithNoTasksCalled);
     }
 
+    @Test
+    public void shouldAddTaskToRepo() {
+
+        TasksActivityView view = new MockView();
+        TasksRepository tasksRepository = new MockTasksRepository(true, true, true);
+
+        TasksActivityPresenter presenter = new TasksActivityPresenter(view, tasksRepository);
+        presenter.saveTask(new Task());
+
+        Assert.assertEquals(true, ((MockView)view).addTaskCalled);
+
+    }
+
+    @Test
+    public void shouldHandleAddNoTaskToRepo() {
+
+        TasksActivityView view = new MockView();
+        TasksRepository tasksRepository = new MockTasksRepository(true, false, true);
+
+        TasksActivityPresenter presenter = new TasksActivityPresenter(view, tasksRepository);
+        presenter.saveTask(new Task());
+
+        Assert.assertEquals(true, ((MockView)view).addNoTaskCalled);
+
+    }
+
+    @Test
+    public void shouldRemoveTaskFromRepo() {
+
+        TasksActivityView view = new MockView();
+        TasksRepository tasksRepository = new MockTasksRepository(true, true, true);
+
+        TasksActivityPresenter presenter = new TasksActivityPresenter(view, tasksRepository);
+        presenter.deleteTask(new Task());
+
+        Assert.assertEquals(true, ((MockView)view).removeTaskCalled);
+
+    }
+
+    @Test
+    public void shouldHandleRemoveNoTaskFromRepo() {
+
+        TasksActivityView view = new MockView();
+        TasksRepository tasksRepository = new MockTasksRepository(true, true, false);
+
+        TasksActivityPresenter presenter = new TasksActivityPresenter(view, tasksRepository);
+        presenter.deleteTask(new Task());
+
+        Assert.assertEquals(true, ((MockView)view).removeNoTaskCalled);
+
+    }
+
     private class MockView implements TasksActivityView {
 
         boolean displayTasksWithTasksCalled;
         boolean displayTasksWithNoTasksCalled;
-
+        boolean addTaskCalled;
+        boolean addNoTaskCalled;
+        boolean removeTaskCalled;
+        boolean removeNoTaskCalled;
 
         @Override
         public void displayTasks(List<Task> taskList) {
@@ -62,15 +117,40 @@ public class TasksActivityPresenterTest {
             displayTasksWithNoTasksCalled = true;
         }
 
+
+        @Override
+        public void addTask(Task task) {
+            addTaskCalled = true;
+        }
+
+        @Override
+        public void addNoTask() {
+            addNoTaskCalled = true;
+        }
+
+        @Override
+        public void removeTask(Task task) {
+            removeTaskCalled = true;
+        }
+
+        @Override
+        public void removeNoTask() {
+            removeNoTaskCalled = true;
+        }
+
     }
 
     private class MockTasksRepository implements TasksRepository {
 
         private boolean returnSomeTasks;
+        private boolean returnSavedTask;
+        private boolean returnRemovedTask;
 
-        public MockTasksRepository(boolean returnSomeTasks) {
+        public MockTasksRepository(boolean returnSomeTasks, boolean returnSavedTask, boolean returnRemovedTask) {
 
             this.returnSomeTasks = returnSomeTasks;
+            this.returnSavedTask = returnSavedTask;
+            this.returnRemovedTask = returnRemovedTask;
         }
 
         @Override
@@ -80,6 +160,26 @@ public class TasksActivityPresenterTest {
                 return Arrays.asList(new Task(), new Task(), new Task());
             } else {
                 return Collections.emptyList();
+            }
+        }
+
+        @Override
+        public Task addTask(Task task) {
+
+            if (returnSavedTask) {
+                return task;
+            } else {
+                return null;
+            }
+        }
+
+        @Override
+        public Task removeTask(Task task) {
+
+            if (returnRemovedTask) {
+                return task;
+            } else {
+                return null;
             }
         }
     }
