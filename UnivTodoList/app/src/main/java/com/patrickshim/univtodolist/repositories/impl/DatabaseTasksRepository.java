@@ -9,6 +9,9 @@ import com.patrickshim.univtodolist.tasks.Task;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.concurrent.Callable;
+
+import io.reactivex.Single;
 
 /**
  * Created by patrickshim on 30/04/2017.
@@ -24,16 +27,23 @@ public class DatabaseTasksRepository implements TasksRepository {
 
     }
 
-    @Override
-    public List<Task> getTasks() {
 
-        try {
-            return databaseHelper.getTaskDao().queryBuilder()
-                    .orderBy("createdAt", true)
-                    .query();
-        } catch (Exception e) {
-            throw new RuntimeException("get task error");
-        }
+    @Override
+    public Single<List<Task>> getTasks() {
+
+        return Single.fromCallable(new Callable<List<Task>>() {
+            @Override
+            public List<Task> call() throws Exception {
+
+                try {
+                    return databaseHelper.getTaskDao().queryBuilder()
+                            .orderBy("createdAt", true)
+                            .query();
+                } catch (Exception e) {
+                    throw new RuntimeException("get task error");
+                }
+            }
+        });
 
     }
 

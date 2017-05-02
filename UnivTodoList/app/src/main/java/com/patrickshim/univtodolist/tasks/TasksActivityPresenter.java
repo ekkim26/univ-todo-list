@@ -4,6 +4,9 @@ import com.patrickshim.univtodolist.repositories.TasksRepository;
 
 import java.util.List;
 
+import io.reactivex.annotations.NonNull;
+import io.reactivex.functions.Consumer;
+
 /**
  * Created by patrickshim on 30/04/2017.
  */
@@ -19,16 +22,35 @@ class TasksActivityPresenter {
     }
 
     public void loadTasks() {
-        try{
 
-            List<Task> taskList = tasksRepository.getTasks();
+        tasksRepository.getTasks()
+                .subscribe(new Consumer<List<Task>>() {
+                    @Override
+                    public void accept(@NonNull List<Task> taskList) throws Exception {
+                        if (taskList.isEmpty()) {
+                            view.displayNoTasks();
+                        } else {
+                            view.displayTasks(taskList);
+                        }
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(@NonNull Throwable throwable) throws Exception {
+                        view.displayError();
+                    }
+                });
 
-            if (taskList.isEmpty()) view.displayNoTasks();
-            else view.displayTasks(taskList);
 
-        } catch(Exception e) {
-            view.displayError();
-        }
+//        try{
+//
+//            List<Task> taskList = tasksRepository.getTasks();
+//
+//            if (taskList.isEmpty()) view.displayNoTasks();
+//            else view.displayTasks(taskList);
+//
+//        } catch(Exception e) {
+//            view.displayError();
+//        }
     }
 
     public void saveTask(Task task) {

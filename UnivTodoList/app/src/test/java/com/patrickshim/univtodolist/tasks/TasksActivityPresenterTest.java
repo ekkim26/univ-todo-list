@@ -13,6 +13,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import io.reactivex.Single;
+
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -36,6 +38,7 @@ public class TasksActivityPresenterTest {
 
     final List<Task> MANY_BOOKS = Arrays.asList(new Task(), new Task(), new Task());
     final Task ONE_BOOK = new Task();
+    final List<Task> EMPTY_LIST = Collections.EMPTY_LIST;
 
     @Before
     public void setUp() {
@@ -46,7 +49,7 @@ public class TasksActivityPresenterTest {
 
     @Test public void shouldPassTasksToView() {
 
-        when(tasksRepository.getTasks()).thenReturn(MANY_BOOKS);
+        when(tasksRepository.getTasks()).thenReturn(Single.just(MANY_BOOKS));
 
         presenter.loadTasks();
 
@@ -56,7 +59,7 @@ public class TasksActivityPresenterTest {
 
     @Test public void shouldHandleNoTasks() {
 
-        when(tasksRepository.getTasks()).thenReturn(Collections.EMPTY_LIST);
+        when(tasksRepository.getTasks()).thenReturn(Single.just(EMPTY_LIST));
 
         presenter.loadTasks();
 
@@ -65,7 +68,7 @@ public class TasksActivityPresenterTest {
 
     @Test public void shouldHandleError() {
 
-        when(tasksRepository.getTasks()).thenThrow(new RuntimeException("get task error"));
+        when(tasksRepository.getTasks()).thenReturn(Single.<List<Task>>error(new Throwable("get task error")));
 
         presenter.loadTasks();
 
