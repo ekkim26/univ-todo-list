@@ -78,6 +78,11 @@ public class TasksActivity extends AppCompatActivity implements TasksActivityVie
     }
 
     @Override
+    public void displayError() {
+        Toast.makeText(this, "Error accessing data", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
     public void addTask(Task task) {
         taskAdapter.add(task);
         taskAdapter.notifyDataSetChanged();

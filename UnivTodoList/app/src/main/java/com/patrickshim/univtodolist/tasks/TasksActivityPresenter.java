@@ -19,10 +19,16 @@ class TasksActivityPresenter {
     }
 
     public void loadTasks() {
-        List<Task> taskList = tasksRepository.getTasks();
+        try{
 
-        if (taskList.isEmpty()) view.displayNoTasks();
-        else view.displayTasks(taskList);
+            List<Task> taskList = tasksRepository.getTasks();
+
+            if (taskList.isEmpty()) view.displayNoTasks();
+            else view.displayTasks(taskList);
+
+        } catch(Exception e) {
+            view.displayError();
+        }
     }
 
     public void saveTask(Task task) {

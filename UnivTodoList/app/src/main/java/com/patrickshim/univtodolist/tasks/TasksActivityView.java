@@ -12,6 +12,8 @@ public interface TasksActivityView {
 
     void displayNoTasks();
 
+    void displayError();
+
     void addTask(Task task);
 
     void addNoTask();

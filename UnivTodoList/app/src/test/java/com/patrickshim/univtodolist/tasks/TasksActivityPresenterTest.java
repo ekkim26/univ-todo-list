@@ -3,22 +3,27 @@ package com.patrickshim.univtodolist.tasks;
 import com.patrickshim.univtodolist.repositories.TasksRepository;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 /**
  * Created by patrickshim on 30/04/2017.
  */
 
-@RunWith(MockitoJUnitRunner.class)
 public class TasksActivityPresenterTest {
+
+    @Rule
+    public MockitoRule mockitoRule = MockitoJUnit.rule();
 
     @Mock
     TasksRepository tasksRepository;
@@ -39,69 +44,72 @@ public class TasksActivityPresenterTest {
 
     }
 
-    @Test
-    public void shouldPassTasksToView() {
+    @Test public void shouldPassTasksToView() {
 
-        Mockito.when(tasksRepository.getTasks()).thenReturn(MANY_BOOKS);
-
-        presenter.loadTasks();
-
-        Mockito.verify(view).displayTasks(MANY_BOOKS);
-
-    }
-
-    @Test
-    public void shouldHandleNoTasks() {
-
-        Mockito.when(tasksRepository.getTasks()).thenReturn(Collections.EMPTY_LIST);
+        when(tasksRepository.getTasks()).thenReturn(MANY_BOOKS);
 
         presenter.loadTasks();
 
-        Mockito.verify(view).displayNoTasks();
+        verify(view).displayTasks(MANY_BOOKS);
+
     }
 
-    @Test
-    public void shouldAddTaskToRepo() {
+    @Test public void shouldHandleNoTasks() {
 
-        Mockito.when(tasksRepository.addTask(ONE_BOOK)).thenReturn(ONE_BOOK);
+        when(tasksRepository.getTasks()).thenReturn(Collections.EMPTY_LIST);
+
+        presenter.loadTasks();
+
+        verify(view).displayNoTasks();
+    }
+
+    @Test public void shouldHandleError() {
+
+        when(tasksRepository.getTasks()).thenThrow(new RuntimeException("get task error"));
+
+        presenter.loadTasks();
+
+        verify(view).displayError();
+
+    }
+
+    @Test public void shouldAddTaskToRepo() {
+
+        when(tasksRepository.addTask(ONE_BOOK)).thenReturn(ONE_BOOK);
 
         presenter.saveTask(ONE_BOOK);
 
-        Mockito.verify(view).addTask(ONE_BOOK);
+        verify(view).addTask(ONE_BOOK);
 
     }
 
-    @Test
-    public void shouldHandleAddNoTaskToRepo() {
+    @Test public void shouldHandleAddNoTaskToRepo() {
 
-        Mockito.when(tasksRepository.addTask(ONE_BOOK)).thenReturn(null);
+        when(tasksRepository.addTask(ONE_BOOK)).thenReturn(null);
 
         presenter.saveTask(ONE_BOOK);
 
-
-        Mockito.verify(view).addNoTask();
-
-    }
-
-    @Test
-    public void shouldRemoveTaskFromRepo() {
-
-        Mockito.when(tasksRepository.removeTask(ONE_BOOK)).thenReturn(ONE_BOOK);
-
-        presenter.deleteTask(ONE_BOOK);
-
-        Mockito.verify(view).removeTask(ONE_BOOK);
+        verify(view).addNoTask();
 
     }
 
-    @Test
-    public void shouldHandleRemoveNoTaskFromRepo() {
+    @Test public void shouldRemoveTaskFromRepo() {
 
-        Mockito.when(tasksRepository.removeTask(ONE_BOOK)).thenReturn(null);
+        when(tasksRepository.removeTask(ONE_BOOK)).thenReturn(ONE_BOOK);
 
         presenter.deleteTask(ONE_BOOK);
 
-        Mockito.verify(view).removeNoTask();
+        verify(view).removeTask(ONE_BOOK);
+
+    }
+
+    @Test public void shouldHandleRemoveNoTaskFromRepo() {
+
+        when(tasksRepository.removeTask(ONE_BOOK)).thenReturn(null);
+
+        presenter.deleteTask(ONE_BOOK);
+
+        verify(view).removeNoTask();
 
     }
 }

@@ -8,7 +8,6 @@ import com.patrickshim.univtodolist.repositories.TasksRepository;
 import com.patrickshim.univtodolist.tasks.Task;
 
 import java.sql.SQLException;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -29,12 +28,11 @@ public class DatabaseTasksRepository implements TasksRepository {
     public List<Task> getTasks() {
 
         try {
-            return databaseHelper.getTaskDao()
-                    .queryBuilder()
+            return databaseHelper.getTaskDao().queryBuilder()
                     .orderBy("createdAt", true)
                     .query();
-        } catch (SQLException e) {
-            return Collections.emptyList();
+        } catch (Exception e) {
+            throw new RuntimeException("get task error");
         }
 
     }
